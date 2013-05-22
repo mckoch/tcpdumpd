@@ -1,0 +1,117 @@
+man(1)                         tcpdumpd man page                        man(1)
+
+
+
+NAME
+       tcpdumpd - run tcpdump in background with multiple configurations.
+
+
+SYNOPSIS
+       tcpdumpd [COMMAND] <PARAMETERS>
+
+
+DESCRIPTION
+       Logs  network  packets  to rotating file ring while silently running in
+       the background. Command line utility and 'daemon' wrapper for tcpdump.
+
+
+OPTIONS
+   [COMMANDS]
+       start  Starts the daemon process.
+
+
+       stop   Stops the daemon process.
+
+
+       setup  Recall install script to change general program options.
+
+
+   <PARAMETERS>
+       -c, --configpath /path/to/config.file
+              Absolute path and filename for custom config file.
+
+
+       -r, --ringfile filename.file
+              Base name (suffix) for a new ringfile. Existing  files  will  be
+              overwritten.
+
+
+       -p, --pidfile /path/to/pidfile.file
+              Absolute path and name of PID file for the new instance.
+
+
+       -n, --numberofringfiles int
+              How many ringfiles to create.
+
+
+       -s, --size int
+              Size of each ringfile in millions of bytes. Integer.
+
+
+       -f, --filter 'quoted expression'
+              Additional  custom  filter  or  options  for  tcpdump. Must be a
+              quoted string.
+
+
+       -h, --help
+              This page.
+
+
+   Example usage
+       tcpdumpd start
+              Start the configured tcpdumpd until stopped by 'tcpdumpd stop'.
+
+
+       tcpdumpd start -p my.pid -r newdmp- -f 'not host my.net'
+              Use standard config for  a  new  tcpdumpd  logging  to  filering
+              'newdmp-*'  and do not log packets to and from host.net. Process
+              information is in my.pid.
+
+
+       tcpdumpd stop --pidfile my.pid
+              Stop the process from my.pid and/or delete  my.pid.  Usefull  if
+              tcpdumpd terminated irregulary and does not restart the process.
+
+
+SEE ALSO
+       tcpdump(1), pgrep(1), update-rc.d(1)
+
+
+BUGS
+       Insufficient support for tcpdump's time switches. Long options not supâ€
+       ported yet.
+
+
+FILES
+       starttcpdump.conf
+              Basic configuration file.
+
+       tcpdumpd-setup
+              Installation and setup script.
+
+       starttcpdump.sh
+              Main shell script and wrapper for tcpdump(1).
+
+       tcpdumpd
+              Main script file for controlling tcpdumpd.
+
+
+HISTORY
+       Version 0.2, May 2013
+              Initial release.
+
+       Version 0.1, Jan 2010
+              Started as system utility for  multi  instanced  tcpdump,  doing
+              long time inspection of certain network packets.
+
+
+AUTHOR
+       Christian Koch (emcekah@gmail.com)
+
+
+COPYRIGHT
+       GPL 3
+
+
+
+0.2                               18 May 2013                           man(1)
