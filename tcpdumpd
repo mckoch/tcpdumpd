@@ -1,0 +1,172 @@
+#!/bin/bash
+# This file is part of tcpdumpd.
+# tcpdumpd is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# tcpdumpd is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with tcpdumpd.  If not, see <http://www.gnu.org/licenses/>.
+##
+# /etc/init.d/tcpdumpd
+# loader for /root/scripts/starttcpdump.sh
+# usage: 'tcpdumpd {start <option: -c path/to/con.fig,> | stop }
+# V0.2 emcekah@gmail.com 2013
+##
+myinstallpath="/root/scripts/tcpdumpd/"
+#myinstallpath="/usr/local/tcpdumpd/"
+myconfig="starttcpdump.cfg"
+source $myinstallpath/$myconfig
+##
+MYCMDOPTIONS=$(getopt -n "$0"  -o a:c:f:j:n:p:r:s:v: --long action:configpath:filter:job:numberofringfiles:pidfile:ringfile:size:verbosity  -- "$@") 
+eval set -- "$MYCMDOPTIONS"
+while true;
+do
+  case "$1" in
+    -c|--configpath)
+  if [ -n "$2" ]
+         then
+         configpath=$2
+	 echo "Config: $configpath"
+	 if [ -f $configpath ]
+	    then source "$configpath"
+	    else echo "Error: file not found." 
+	    exit 1
+	 fi
+      fi
+      shift 2;;
+    -r|--ringfile)
+      tcpdump_RINGFILE=$2
+      echo "using prefix $tcpdump_RINGFILE"
+      #exit
+      shift 2;;
+     -p|--pidfile)
+     tcpdump_PIDFILE=$2
+      echo "using pidfile $tcpdump_PIDFILE."
+      #exit
+      shift 2;;
+     -n|--numberofringfiles)
+     tcpdump_FILECOUNT="-W $2"
+      echo "number of ringfiles: $tcpdump_FILECOUNT."
+      #exit
+      shift 2;;
+    -s|--size)
+    tcpdump_FILESIZE="-C $2"
+      echo "filesize: $tcpdump_FILESIZE e7 bytes."
+      #exit
+      shift 2;;
+     -f|--filter)
+	if [ -n "$2" ]
+         then
+         tcpdump_FILTER=$2
+	 echo "Filter: $tcpdump_FILTER"
+      fi
+      shift 2;;
+ -v|--verbosity)
+	if [ -n "$2" ]
+         then
+         tcpdump_VERBOSITY="$2"
+	 echo "verbosity: $tcpdump_VERBOSITY"
+      fi
+      shift 2;;
+ -j|--job)
+	if [ -n "$2" ]
+         then
+	  if [ -f "$myinstallpath$configpath.conf" ]
+	    then source "$configpath"
+	    echo "configuration file $configpath"
+	 fi
+         tcpdump_PIDFILE=$mydumpdir$2
+	 tcpdump_RINGFILE=$2-
+	 echo "jobdir: $mydumpdir"
+	 echo "pidfile: $2"
+	 echo "ringfiles: $2-*"
+      fi
+      shift 2;;
+   --)
+      shift
+      break;;
+  esac
+done
+# #
+case "$1" in
+  start)
+    echo "Starting tcpdumpd ... "
+    if [ -f  $tcpdump_PIDFILE ]
+    then
+      echo "An error occured. Already running?"
+      echo "Try 'tcpdumpd status'."
+      exit 1
+    fi
+    source $myinstallpath/starttcpdump.sh
+    ;;
+  stop)
+    echo "Stopping script..."
+    if [ $2 ]; then 
+	 if [ -f  $mydumpdir$2 ]; then tcpdump_PID=$(< $mydumpdir$2)
+	 kill $tcpdump_PID 
+	 rm $mydumpdir$2
+	 exit 0 
+	 else echo "pidfile $2 not found."
+	 exit 1
+	 fi
+    fi
+    ###
+    if [ -f  $tcpdump_PIDFILE ]
+    then
+     tcpdump_PID=$(< $tcpdump_PIDFILE)  
+     rm $tcpdump_PIDFILE 
+     kill  $tcpdump_PID
+     echo "Stopped."
+    else
+	echo "An error occured."
+      exit 1
+    fi
+    ;;
+  setup)
+      echo "loading setup script..."
+      source  $myinstallpath/tcpdumpd-setup
+      exit 0
+    ;;
+  status)
+      
+      if [ $2 ]; then 
+	 if [ -f  $mydumpdir$2 ]; then tcpdump_PID=$(< $mydumpdir$2)
+	 ps -p $tcpdump_PID -j
+	 ls -s1 $mydumpdir$2*
+	 exit 0 
+	 else echo "pidfile $2 not found."
+	 exit 1
+	 fi
+      fi
+      echo "Main status from $tcpdump_PIDFILE:"
+      if [ -f $tcpdump_PIDFILE ]; 
+        then tcpdump_PID=$(< $tcpdump_PIDFILE);
+	ps -p $tcpdump_PID -j
+	ls -s1 $mydumpdir$tcpdump_RINGFILE*
+        else echo "$tcpdump_PIDFILE not found.";  
+      fi
+      echo "Running tcpdumpd processes: "
+      ps -U $myrunuser -j 
+      exit 0
+    ;;
+    restart)
+       $myinstallpath/tcpdumpd stop
+       $myinstallpath/tcpdumpd start
+  ;;
+  *)
+    echo "Usage: tcpdumpd {start|stop|status|setup} <--options>"
+    echo "Options:"
+    echo "-c --config <abspath>, -f --filter <'filter string'>,"
+    echo "-n --numberofringfiles <int>, -r --ringfile <filename>, "
+    echo "-s --size <int MB>, -p --pidfile <abspath>, -j --job <jobname>"
+    echo "Try 'man tcpdumpd' for more help."
+    exit 1
+    ;;
+esac
+##
+exit 0
+##
