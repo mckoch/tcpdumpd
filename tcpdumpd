@@ -16,8 +16,8 @@
 # usage: 'tcpdumpd {start <option: -c path/to/con.fig,> | stop }
 # V0.2 emcekah@gmail.com 2013
 ##
-myinstallpath="/root/scripts/tcpdumpd/"
-#myinstallpath="/usr/local/tcpdumpd/"
+#myinstallpath="/root/scripts/tcpdumpd/"
+myinstallpath="/usr/local/tcpdumpd/"
 myconfig="starttcpdump.cfg"
 source $myinstallpath/$myconfig
 ##
