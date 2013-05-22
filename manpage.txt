@@ -12,7 +12,8 @@ SYNOPSIS
 
 DESCRIPTION
        Logs  network  packets  to rotating file ring while silently running in
-       the background. Command line utility and 'daemon' wrapper for tcpdump.
+       the background. Command line utility and 'daemon' wrapper for  tcpdump.
+       Supports multiple configurations and instances.
 
 
 OPTIONS
@@ -21,6 +22,11 @@ OPTIONS
 
 
        stop   Stops the daemon process.
+
+
+       status Checks  for running tcpdumpd processes. Accepts a single pidfile
+              (absolute path or job name, see '-j', -p, -r) to check it's staâ€
+              tus.
 
 
        setup  Recall install script to change general program options.
@@ -32,7 +38,7 @@ OPTIONS
 
 
        -r, --ringfile filename.file
-              Base name (suffix) for a new ringfile. Existing  files  will  be
+              Base  name  (suffix)  for a new ringfile. Existing files will be
               overwritten.
 
 
@@ -49,12 +55,21 @@ OPTIONS
 
 
        -f, --filter 'quoted expression'
-              Additional  custom  filter  or  options  for  tcpdump. Must be a
-              quoted string.
+              Additional custom filter or  options  for  tcpdump.  Must  be  a
+              quoted string. See  man pcap-savefile (5) .
 
 
-       -h, --help
-              This page.
+       -v, --verbosity 'tcpdump_verbosity_param'
+              Toggle  verbosity. Must be a quoted string ('-v', '-vv', '-vvv',
+              see tcpdump(1))
+
+
+       -j, --job jobname
+              Shorthand to create pidfile  and  ringfiles  with  corresponding
+              names.  If  a file 'jobname' and suffix 'conf' is present in the
+              program dir ($myinstalldir) this one will be used instead of the
+              default  config  file.  Do *not* use in conjunction with '-r' or
+              '-p' options.
 
 
    Example usage
@@ -68,13 +83,22 @@ OPTIONS
               information is in my.pid.
 
 
-       tcpdumpd stop --pidfile my.pid
-              Stop the process from my.pid and/or delete  my.pid.  Usefull  if
-              tcpdumpd terminated irregulary and does not restart the process.
+       tcpdumpd start -j mynewjob -s 50
+              Will  create  a  filering   of   'mynewjob*'   and   a   pidfile
+              'mynewjob.pid',  using  default values from config. Each file in
+              the  ring  will  have  a  size  of  fifty  million   bytes.   If
+              'mynewjob.conf'  is present in '$myinstalldir' it will be evaluâ€
+              ated.
+
+
+       tcpdumpd stop mynewjob
+              Stop the process from 'mynewjob' and/or delete  it.  Usefull  if
+              tcpdumpd terminated irregulary and does not restart the job.
 
 
 SEE ALSO
-       tcpdump(1), pgrep(1), update-rc.d(1)
+       tcpdump(1),  pgrep(1),  update-rc.d(1),  tshark(1),   pcap-savefile(5),
+       strftime(3)
 
 
 BUGS
@@ -86,7 +110,7 @@ FILES
        starttcpdump.conf
               Basic configuration file.
 
-       tcpdumpd-setup
+       tcpdumpd-setup.sh
               Installation and setup script.
 
        starttcpdump.sh
@@ -95,13 +119,24 @@ FILES
        tcpdumpd
               Main script file for controlling tcpdumpd.
 
+       tcpdumpd.log
+              Logfile for start / stop and some diagnostic output.
+
+
+DEFAULT PATHES
+       /usr/local/tcpdumpd/
+              Program, config and setup files.
+
+       /var/log/tcpdumpd/
+              Place for the default ring, log and pid files
+
 
 HISTORY
        Version 0.2, May 2013
               Initial release.
 
        Version 0.1, Jan 2010
-              Started as system utility for  multi  instanced  tcpdump,  doing
+              Started  as  system  utility  for multi instanced tcpdump, doing
               long time inspection of certain network packets.
 
 
