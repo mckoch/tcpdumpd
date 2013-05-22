@@ -1,0 +1,100 @@
+.\" Manpage for tcpdumpd.
+.\" Contact emcekah@gmail.com to correct errors or typos.
+.TH man 1 "18 May 2013" "0.2" "tcpdumpd man page"
+.SH NAME
+tcpdumpd \- run tcpdump in background with multiple configurations.
+
+.SH SYNOPSIS
+tcpdumpd [COMMAND] <PARAMETERS>
+
+.SH DESCRIPTION
+Logs network packets to rotating file ring while silently running in the background. Command line utility and 'daemon' wrapper for tcpdump. Supports multiple configurations and instances. 
+
+.SH OPTIONS
+.SS "[COMMANDS]"
+.IP start
+Starts the daemon process.
+
+.IP stop
+Stops the daemon process.
+
+.IP status [pidfile]
+Checks for running tcpdumpd processes. Accepts a single pidfile (absolute path or job name, see '-j', -p, -r) to check it's status.
+
+.IP setup
+Recall install script to change general program options.
+
+.SS "<PARAMETERS>"
+.IP "-c, --configpath /path/to/config.file"
+Absolute path and filename for custom config file.
+
+.IP "-r, --ringfile filename.file"
+Base name (suffix) for a new ringfile. Existing files will be overwritten.
+
+.IP "-p, --pidfile /path/to/pidfile.file"
+Absolute path and name of PID file for the new instance.
+
+.IP "-n, --numberofringfiles int"
+How many ringfiles to create.
+
+.IP "-s, --size int"
+Size of each ringfile in millions of bytes. Integer.
+
+.IP "-f, --filter 'quoted expression'"
+Additional custom filter or options for tcpdump. Must be a quoted string. See  man 
+.B  "pcap-savefile (5)".
+
+.IP "-v, --verbosity 'tcpdump_verbosity_param'"
+Toggle verbosity. Must be a quoted string ('-v', '-vv', '-vvv', see tcpdump(1))
+
+.IP "-j, --job jobname"
+Shorthand to create pidfile and ringfiles with corresponding names. If a file 'jobname' and suffix 'conf' is present in the program dir ($myinstalldir) this one will be used instead of the default config file. Do *not* use in conjunction with '-r' or '-p' options.
+
+.SS "Example usage"
+.IP "tcpdumpd start"
+Start the configured tcpdumpd until stopped by 'tcpdumpd stop'.
+
+.IP "tcpdumpd start -p my.pid -r newdmp- -f 'not host my.net'"
+Use standard config for a new tcpdumpd logging to filering 'newdmp-*' and do not log packets to and from host.net. Process information is in my.pid. 
+
+.IP "tcpdumpd start -j mynewjob -s 50"
+Will create a filering of 'mynewjob*' and a pidfile 'mynewjob.pid', using default values from config. Each file in the ring will have a size of fifty million bytes. If 'mynewjob.conf' is present in '$myinstalldir' it will be evaluated.
+
+.IP "tcpdumpd stop mynewjob"
+Stop the process from 'mynewjob' and/or delete it. Usefull if tcpdumpd terminated irregulary and does not restart the job.
+
+.SH SEE ALSO
+tcpdump(1), pgrep(1), update-rc.d(1), tshark(1),  pcap-savefile(5), strftime(3)
+
+.SH BUGS
+Insufficient support for tcpdump's time switches. Long options not supported yet.
+
+.SH FILES
+.IP starttcpdump.conf
+Basic configuration file.
+.IP "tcpdumpd-setup.sh"
+Installation and setup script. 
+.IP "starttcpdump.sh"
+Main shell script and wrapper for tcpdump(1).
+.IP "tcpdumpd"
+Main script file for controlling tcpdumpd. 
+.IP tcpdumpd.log
+Logfile for start / stop and some diagnostic output.
+
+.SH DEFAULT PATHES
+.IP /usr/local/tcpdumpd/
+Program, config and setup files.
+.IP /var/log/tcpdumpd/
+Place for the default ring, log and pid files
+
+.SH HISTORY
+.IP "Version 0.2, May 2013"
+Initial release.
+.IP "Version 0.1, Jan 2010"
+Started as system utility for multi instanced tcpdump, doing long time inspection of certain network packets. 
+
+.SH AUTHOR
+Christian Koch (emcekah@gmail.com)
+
+.SH COPYRIGHT
+GPL 3
