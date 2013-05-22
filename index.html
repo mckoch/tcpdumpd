@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Tcpdumpd by mckoch</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Tcpdumpd</h1>
+        <p>Logs  network  packets  to rotating file ring while silently running in        the background. Command line utility and 'daemon' wrapper for  tcpdump. Supports multiple configurations and instances.</p>
+
+        <p class="view"><a href="https://github.com/mckoch/tcpdumpd">View the Project on GitHub <small>mckoch/tcpdumpd</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/mckoch/tcpdumpd/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mckoch/tcpdumpd/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mckoch/tcpdumpd">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>tcpdumpd</h1>
+
+<p>Logs  network  packets  to rotating file ring while silently running in        the background. Command line utility and 'daemon' wrapper for  tcpdump. Supports multiple configurations and instances.</p>
+
+<h2>tcpdumpd v0.21</h2>
+
+<p>Wrapper and control script for tcpdump which makes it easy to log network packets in the background to a file ring. tcpdump allows multiple configurations and instances for simultaneous logging to several file rings. By default, one tcpdumpd instance is started at boot time as a permanent short time logging service. </p>
+
+<h3>Usage</h3>
+
+<pre><code>  $&gt; tcpdumpd (start|status|stop|restart|setup) &lt; -param val &gt;
+</code></pre>
+
+<h3>Dependencies</h3>
+
+<p>A linux box, some knowledge about tcpdump, ssh root access.</p>
+
+<h3>Installation</h3>
+
+<ol>
+<li>Unzip/untar the archive in a safe place</li>
+<li>chdir there.</li>
+<li>Run ./tcpdump-setup.sh as root.</li>
+<li>Answer 'yes' for default installation.</li>
+</ol><h3>Changing install configuration</h3>
+
+<p>To change the setup values, edit starttcpdump.cfg. To install to a different program directory, you will have to edit the file tcpdumpd too.  First line:</p>
+
+<pre><code>    myinstallpath="/root/scripts/tcpdumpd/"    
+</code></pre>
+
+<h2>Post install</h2>
+
+<pre><code>$&gt; man tcpdumpd'.
+</code></pre>
+
+<ol>
+<li>
+<p>Adjust the defaults for size and number of ring files to the size and traffic of the box.</p>
+
+<pre><code>#number of logfiles before overwritimg
+tcpdump_FILECOUNT="-W 3"
+# int max filesize in millions of bytes 
+tcpdump_FILESIZE="-C 1" 
+</code></pre>
+</li>
+<li>
+<p>Adjust the filter, except you want to log everything.</p>
+
+<pre><code># tcpdump verbosity optipns: -v -vv -vvv
+tcpdump_VERBOSITY=" -v -n "
+# tcpdump filter, i.e. ' -i eth0 -p udp host 1.2.3.4 "
+tcpdump_FILTER=" not host localhost "   
+</code></pre>
+</li>
+</ol><h3>Uninstall</h3>
+
+<p>The installer script will overwrite its default files from a previous installation. It will not touch any files generated during runtime (logs, configs). </p>
+
+<ol>
+<li>Stop all running instances.</li>
+<li>Run 'tcdumpd setup' or</li>
+<li>Chdir to the program directory (which is /usr/local/tcpdumpd by default) and run './tcpdumpd setup' as root.</li>
+<li>'no' if setup asks if tcpdumpd shall start at system boot.</li>
+<li>'no' if setup asks for creating a link in /sbin.</li>
+<li>You may 'ctrl-c' afterwards to exit setup.</li>
+<li>Manually delete /usr/local/tcpdumpd and /var/log/tcpdumpd</li>
+</ol><h2>Important</h2>
+
+<p>This program is NOT designed to run in user space. It is NOT a good idea to add users to tcpdumpd's group since this would be a massive break of privacy in a shared environment, at least. Last, it is absolutely NO good idea to let tcpdumpd run as user or in group 'root'.</p>
+
+<h3>Bugs</h3>
+
+<p>This script is tested in Debian 4, 5 and 6, even if 'update-rc.d' may complain during setup This will be fixed with a future (hopefully) dpkg release. Check <a href="https://github.com/mckoch/tcpdumpd">https://github.com/mckoch/tcpdumpd</a> for questions and updates.  </p>
+
+<h3>License</h3>
+
+<p>Copyright M. Christian Koch, <a href="mailto:emcekah@gmail.com">emcekah@gmail.com</a>, 2013. This program and documentation is licensed under the GNU General Public License V3 (because 'free' in 'free software' has nothing to with 'free' in 'free beer'). </p>
+
+<p>Enjoy!</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mckoch">mckoch</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
